@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "PGTestCharacter.generated.h"
 
+class UInteractionComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
@@ -48,6 +49,9 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
+	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* PrimaryInteractionAction;
 
 public:
 
@@ -84,6 +88,8 @@ public:
 	/** Handles jump pressed inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
+	
+	void PrimaryInteract();
 
 public:
 
@@ -92,5 +98,8 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInteractionComponent> InteractionComp;
 };
 

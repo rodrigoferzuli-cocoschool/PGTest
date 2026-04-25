@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "PGTest.h"
+#include "Components/InteractionComponent.h"
 
 APGTestCharacter::APGTestCharacter()
 {
@@ -45,6 +46,8 @@ APGTestCharacter::APGTestCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+	
+	InteractionComp = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComp"));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -65,6 +68,9 @@ void APGTestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APGTestCharacter::Look);
+		
+		// Interacting
+		EnhancedInputComponent->BindAction(PrimaryInteractionAction, ETriggerEvent::Started, this, &ThisClass::PrimaryInteract);
 	}
 	else
 	{
@@ -130,4 +136,9 @@ void APGTestCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void APGTestCharacter::PrimaryInteract()
+{
+	InteractionComp->PrimaryInteract();
 }
