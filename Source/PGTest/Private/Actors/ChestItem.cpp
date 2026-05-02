@@ -28,7 +28,6 @@ void AChestItem::Interact_Implementation(APawn* InstigatorPawn)
 void AChestItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AChestItem::UpdateLidChest_Implementation()
