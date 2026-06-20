@@ -4,6 +4,7 @@
 #include "Public/Actors/WallLever.h"
 
 #include "Interfaces/GameplayInterface.h"
+#include "Managers/MyGameInstance.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -37,7 +38,13 @@ void AWallLever::Interact_Implementation(APawn* InstigatorPawn)
 {
 	IGameplayInterface::Interact_Implementation(InstigatorPawn);
 	
+	UMyGameInstance* MyGameInstance = Cast<UMyGameInstance>(GetGameInstance());
+	if (!MyGameInstance) return;
+
+	if (!MyGameInstance->bHasDoorKey) return;
+	
 	if (!bCanUpdate) return;
+	
 	bLeverOn = !bLeverOn;
 	UpdateLever();
 }

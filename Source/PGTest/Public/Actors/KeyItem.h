@@ -5,34 +5,25 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/GameplayInterface.h"
-#include "WallLever.generated.h"
+#include "KeyItem.generated.h"
 
 UCLASS()
-class PGTEST_API AWallLever : public AActor, public IGameplayInterface
+class PGTEST_API AKeyItem : public AActor, public IGameplayInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	AWallLever();
-	
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	AKeyItem();
 
-	UPROPERTY(EditAnywhere)
-	float TargetPitch = 20.0f;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
-	UPROPERTY(ReplicatedUsing=OnRep_LeverOn, EditDefaultsOnly)
-	bool bLeverOn;
-	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	bool bCanUpdate = true;
+	UPROPERTY(ReplicatedUsing=OnRep_KeyGrabbed, EditDefaultsOnly)
+	bool bKeyGrabbed;
 	
 	UFUNCTION()
-	void OnRep_LeverOn();
+	void OnRep_KeyGrabbed();
 	
-	UFUNCTION(BlueprintCallable)
-	float GetCurrentLeverPitch() const;
-
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
 protected:
@@ -43,8 +34,8 @@ protected:
 	TObjectPtr<UStaticMeshComponent> BaseMesh;
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> LeverMesh;
+	TObjectPtr<UStaticMeshComponent> KeyMesh;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Exec, Category="Interactable")
-	void UpdateLever();
+	void UpdateKey();
 };

@@ -2,6 +2,9 @@
 
 #include "PGTestGameMode.h"
 
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 APGTestGameMode::APGTestGameMode()
 {
 	// stub
@@ -9,9 +12,28 @@ APGTestGameMode::APGTestGameMode()
 
 void APGTestGameMode::CompleteMission(APawn* MyPawn)
 {
-	if (MyPawn == nullptr) return;
+	if (!HasAuthority()) return;
 	
-	MyPawn->DisableInput(nullptr);
-	
+	if (!MyPawn) return;
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		if (!PlayerController) continue;
+
+		APawn* Pawn = PlayerController->GetPawn();
+		if (!Pawn) continue;
+
+		Pawn->DisableInput(PlayerController);
+
+		if (ACharacter* Character = Cast<ACharacter>(Pawn))
+		{
+			Character->GetCharacterMovement()->DisableMovement();
+		}
+
+		PlayerController->SetIgnoreMoveInput(true);
+		PlayerController->SetIgnoreLookInput(true);
+	}
+
 	OnMissionComplete(MyPawn);
 }
