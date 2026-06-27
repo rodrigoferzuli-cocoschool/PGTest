@@ -23,7 +23,12 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category="GameMode")
 	void OnMissionComplete(APawn* MyPawn);
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category="GameMode")
+	TSubclassOf<AActor> SpectatorViewClass;
+
+	float BlendTime = 3.0f;
+	
+	void UpdateViewTargetCamera(APawn* InPawn);
 };
-
-
-

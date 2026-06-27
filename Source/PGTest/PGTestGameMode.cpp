@@ -4,6 +4,7 @@
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 APGTestGameMode::APGTestGameMode()
 {
@@ -35,5 +36,25 @@ void APGTestGameMode::CompleteMission(APawn* MyPawn)
 		PlayerController->SetIgnoreLookInput(true);
 	}
 
+	UpdateViewTargetCamera(MyPawn);
 	OnMissionComplete(MyPawn);
+}
+
+void APGTestGameMode::UpdateViewTargetCamera(APawn* InPawn)
+{
+	if (InPawn == nullptr) return;
+
+	if (SpectatorViewClass == nullptr) return;
+
+	TArray<AActor*> ReturnedActors;
+	UGameplayStatics::GetAllActorsOfClass(this, SpectatorViewClass, ReturnedActors);
+	if (ReturnedActors.IsEmpty()) return;
+	
+	AActor* NewViewTarget = ReturnedActors[0];
+
+	APlayerController* PlayerController = Cast<APlayerController>(InPawn->GetController());
+	if (PlayerController == nullptr) return;
+
+	if (NewViewTarget == nullptr) return;
+	PlayerController->SetViewTargetWithBlend(NewViewTarget, BlendTime, VTBlend_Cubic);
 }
