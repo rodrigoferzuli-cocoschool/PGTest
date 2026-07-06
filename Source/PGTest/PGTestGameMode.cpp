@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Managers/MyGameStateBase.h"
 
 APGTestGameMode::APGTestGameMode()
 {
@@ -13,30 +14,18 @@ APGTestGameMode::APGTestGameMode()
 
 void APGTestGameMode::CompleteMission(APawn* MyPawn)
 {
-	if (!HasAuthority()) return;
+	if (MyPawn == nullptr) return;
+   
+	//MyPawn->DisableInput(nullptr);
 	
-	if (!MyPawn) return;
-
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	UpdateViewTargetCamera(MyPawn);
+	
+	AMyGameStateBase* GS = GetGameState<AMyGameStateBase>();
+	if (GS != nullptr)
 	{
-		APlayerController* PlayerController = Iterator->Get();
-		if (!PlayerController) continue;
-
-		APawn* Pawn = PlayerController->GetPawn();
-		if (!Pawn) continue;
-
-		Pawn->DisableInput(PlayerController);
-
-		if (ACharacter* Character = Cast<ACharacter>(Pawn))
-		{
-			Character->GetCharacterMovement()->DisableMovement();
-		}
-
-		PlayerController->SetIgnoreMoveInput(true);
-		PlayerController->SetIgnoreLookInput(true);
+		GS->Multicast_OnMissionComplete(MyPawn);
 	}
 
-	UpdateViewTargetCamera(MyPawn);
 	OnMissionComplete(MyPawn);
 }
 
@@ -51,10 +40,13 @@ void APGTestGameMode::UpdateViewTargetCamera(APawn* InPawn)
 	if (ReturnedActors.IsEmpty()) return;
 	
 	AActor* NewViewTarget = ReturnedActors[0];
-
-	APlayerController* PlayerController = Cast<APlayerController>(InPawn->GetController());
-	if (PlayerController == nullptr) return;
-
 	if (NewViewTarget == nullptr) return;
-	PlayerController->SetViewTargetWithBlend(NewViewTarget, BlendTime, VTBlend_Cubic);
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (PC == nullptr) return;
+		
+		PC->SetViewTargetWithBlend(NewViewTarget, BlendTime, VTBlend_Cubic);
+	}
 }
